@@ -15,10 +15,22 @@ A C command-line utility that converts signed 64-bit integers into their hexadec
 
 ## Compilation
 
-Compile with `gcc` or `clang`:
+### Linux & macOS (GCC / Clang)
 
 ```bash
 gcc -Wall -Wextra -O2 hexbin64.c -o hexbin64
+```
+
+### Windows (MinGW / GCC)
+
+```powershell
+gcc -Wall -Wextra -O2 hexbin64.c -o hexbin64.exe
+```
+
+### Windows (MSVC / Developer Command Prompt)
+
+```cmd
+cl /W4 /O2 hexbin64.c
 ```
 
 ## Usage
