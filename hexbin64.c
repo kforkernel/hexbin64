@@ -24,7 +24,7 @@ void print_binary(int64_t num) {
     uint64_t bits = (uint64_t)num;
 
     // print twos complement
-    printf("Two's complement\n");
+    printf("Number (%" PRId64 "): Two's complement\n", num);
     for (int i = 63; i >= 0; i--){
         printf("%d", (int)((bits >> i) & 1ULL)); // 1ULL just means 1 as unsigned 64 bit int
         if (i % 8 == 0 && i != 0) printf(" "); // space between every byte
@@ -37,7 +37,7 @@ void print_binary(int64_t num) {
     // does same technique as twos if greater than or equal to 0
     if (num >= 0){
         // print ones complement
-        printf("One's complement\n");
+        printf("Number (%" PRId64 "): One's complement\n", num);
         for (int i = 63; i >= 0; i--){
             printf("%d", (int)((bits >> i) & 1ULL));
             if (i % 8 == 0 && i != 0) printf(" ");
@@ -49,7 +49,7 @@ void print_binary(int64_t num) {
 
 
         // print sign magnitude
-        printf("Sign magnitude\n");
+        printf("Number (%" PRId64 "): Sign magnitude\n", num);
         for (int i = 63; i >= 0; i--){
             printf("%d", (int)((bits >> i) & 1ULL));
             if (i % 8 == 0 && i != 0) printf(" "); 
@@ -64,7 +64,7 @@ void print_binary(int64_t num) {
             exit(1);
         }
         // print ones complement
-        printf("One's complement\n");
+        printf("Number (%" PRId64 "): One's complement\n", num);
         uint64_t ones = bits - 1ULL;
         for (int i = 63; i >= 0; i--){
             printf("%d", (int)((ones >> i) & 1ULL));
@@ -77,7 +77,7 @@ void print_binary(int64_t num) {
 
 
         // print sign magnitude
-        printf("Sign magnitude\n");
+        printf("Number (%" PRId64 "): Sign magnitude\n", num);
         // note when i write 0010 or other binary this is shortened version of 64 bit for ease
         // below mag means (~bits + 1ULL) invert bits val (~ means NOT aka invert bits) e.g lets say bits = -5 (1011), ~bits = 4 (0100)
         // the + 1ULL then adds unsigned 1 to it so its 0100 (4) + 0001 (1) which equals 5 (0101) aka opposite of -5
@@ -95,9 +95,40 @@ void print_binary(int64_t num) {
         printf("\nHex: 0x%016" PRIX64, mag);
         printf("\n------------------------------------------------------\n\n");
     }
+    printf("\n\n\n\n\n\n");
 }
 
-int main(void){
+int main(int argc, char *argv[]){
+
+    if (argc >= 2){
+        for (int i = 1; i < argc; i++){
+            char *endptr;
+            errno = 0;
+            intmax_t number = strtoimax(argv[i], &endptr, 10);
+
+            if (endptr == argv[i]){
+                fprintf(stderr, "Entered invalid character(s)\nEnter only numbers (0-9)\nMIN: -9,223,372,036,854,775,807 -(2⁶³ - 1)\nMAX: 9,223,372,036,854,775,807 (2⁶³ - 1)\n");
+                return 1; 
+            }
+            else if (*endptr != '\n' && *endptr != '\0') {
+                // stopped early -> trailing junk after digits (e.g., "123abc")
+                fprintf(stderr, "Entered invalid character(s)\nEnter only numbers (0-9)\nMIN: -9,223,372,036,854,775,807 -(2⁶³ - 1)\nMAX: 9,223,372,036,854,775,807 (2⁶³ - 1)\n");
+                return 1;
+            } 
+            else if (errno == ERANGE || number < INT64_MIN || number > INT64_MAX){
+                // number too big/small for 64 bits
+                fprintf(stderr, "Entered out of range number\nMIN: -9,223,372,036,854,775,807 -(2⁶³ - 1)\nMAX: 9,223,372,036,854,775,807 (2⁶³ - 1)\n");
+                return 1;
+            } 
+            else{
+                int64_t num = (int64_t)number; // safe to cast and use
+                print_binary(num);
+            }
+        }
+        return 0;
+    }
+
+
 
     char input_buf[64] = {0};
     char *user_input;
@@ -128,7 +159,7 @@ int main(void){
         } 
         else if (errno == ERANGE || number < INT64_MIN || number > INT64_MAX){
             // number too big/small for 64 bits
-            fprintf(stderr, "Entered out of range number\nMIN: -9,223,372,036,854,775,807 -(2⁶³ - 1)\nMAX: 9,223,372,036,854,775,807(2⁶³ - 1)\n");
+            fprintf(stderr, "Entered out of range number\nMIN: -9,223,372,036,854,775,807 -(2⁶³ - 1)\nMAX: 9,223,372,036,854,775,807 (2⁶³ - 1)\n");
             return 1;
         } 
         else{
